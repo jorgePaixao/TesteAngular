@@ -12,7 +12,9 @@ namespace CadastroUsuarios.Repositorio
 
         Task<Usuario[]> GetTodosUsuarios();
 
-        Usuario GetUsuario(int id);
+        Task<Usuario> GetUsuario(int id);
+
+        bool VerificaUsuarioExiste(int id);
 
     }
 }

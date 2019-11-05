@@ -33,9 +33,9 @@ namespace CadastroUsuarios.Repositorio
             return await query.ToArrayAsync(); 
         }
 
-        public Usuario GetUsuario(int id)
+        public async Task<Usuario> GetUsuario(int id)
         {
-            Usuario  usuario = _context.Usuarios.Where(x => x.UsuarioId == id).FirstOrDefault();  
+            Usuario  usuario = await _context.Usuarios.Where(x => x.UsuarioId == id).FirstOrDefaultAsync();  
             
             return usuario; 
         }
@@ -45,5 +45,11 @@ namespace CadastroUsuarios.Repositorio
             return (await _context.SaveChangesAsync()) > 0;
         }
 
+        public bool VerificaUsuarioExiste(int id)
+        {
+            Usuario usuario =  _context.Usuarios.Where(x => x.UsuarioId == id).FirstOrDefault();
+
+            return usuario != null;
+        }
     }
 }

@@ -36,11 +36,11 @@ namespace CadastroUsuarios.WebApi.Controllers
 
         // GET api/usuario/5
         [HttpGet("{id}")]
-        public  IActionResult Get(int id)
+        public async Task<IActionResult> Get(int id)
         {
             try
             {
-                var resultado =  _repo.GetUsuario(id);
+                var resultado = await _repo.GetUsuario(id);
                 return Ok(resultado);
             }
             catch (System.Exception ex)
@@ -50,7 +50,7 @@ namespace CadastroUsuarios.WebApi.Controllers
         }
 
         // POST api/usuario
-        [HttpPost]        
+        [HttpPost]
         public async Task<IActionResult> Post([FromBody]Usuario model)
         {
 
@@ -70,18 +70,29 @@ namespace CadastroUsuarios.WebApi.Controllers
             catch (System.Exception ex)
             {
                 return this.StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
-            }            
+            }
 
         }
 
         // PUT api/usuario/5
-        [HttpPut("{UsuarioId}")]
-       public async Task<IActionResult> Put([FromBody]Usuario model,int Id)
+        [HttpPut("{Id}")]
+        public async Task<IActionResult> Put([FromBody]Usuario model, int Id)
         {
 
             try
             {
-                _repo.Update(model);
+                var usuario = await _repo.GetUsuario(Id);
+
+                if (usuario == null) return NotFound();
+
+
+                usuario.DataNascimento = model.DataNascimento;
+                usuario.Email = model.Email;
+                usuario.Escolaridade = model.Escolaridade;
+                usuario.Nome = model.Nome;
+                usuario.Sobrenome = model.Sobrenome;
+                
+                _repo.Update(usuario);
 
                 if (await _repo.SaveChangesAsync())
                     return Ok();
@@ -92,22 +103,23 @@ namespace CadastroUsuarios.WebApi.Controllers
             catch (System.Exception ex)
             {
                 return this.StatusCode(StatusCodes.Status500InternalServerError, ex.Message);
-            }            
+            }
 
         }
 
         // DELETE api/values/5
-        [HttpDelete("{id}")]
+        [HttpDelete("{Id}")]
 
-        public async Task<IActionResult> Delete(int id)
+        public async Task<IActionResult> Delete(int Id)
         {
             try
             {
-                var usuario = _repo.GetUsuario(id);
-                
+                var usuario = await _repo.GetUsuario(Id);
+                if (usuario == null) return NotFound();
+
                 _repo.Delete(usuario);
 
-                 if (await _repo.SaveChangesAsync())
+                if (await _repo.SaveChangesAsync())
                     return Ok();
                 else
                     return BadRequest();
